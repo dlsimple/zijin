@@ -1,87 +1,74 @@
 import math
 import plotext as plt
+import heapq
 
 
-def put_next_max_ac(d, x, y):
-    if x >= 2 and (x - 1) >= y:
-        key = (x - 1) ** 2 + y**2
+def get_max_c_point(d):
+    max_ac2, max_ac_x, max_ac_y = heapq.heappop(d)
+
+    if max_ac_x >= 2 and (max_ac_x - 1) >= max_ac_y:
+        key = (max_ac_x - 1) ** 2 + max_ac_y**2
         if key not in d:
-            d[key] = (x - 1, y)
-    if y >= 2:
-        key = x**2 + (y - 1) ** 2
+            heapq.heappush(d, (-key, max_ac_x - 1, max_ac_y))
+    if max_ac_y >= 2:
+        key = max_ac_x**2 + (max_ac_y - 1) ** 2
         if key not in d:
-            d[key] = (x, y - 1)
+            heapq.heappush(d, (-key, max_ac_x, max_ac_y - 1))
+
+    return -max_ac2, (max_ac_x, max_ac_y)
 
 
-def pop_max_ac(d: dict):
-    tmp = sorted(d.items(), reverse=True)
-    max_ac2, (max_ac_x, max_ac_y) = next(iter(tmp))
-    del d[max_ac2]
-    put_next_max_ac(d, max_ac_x, max_ac_y)
-
-    return max_ac2, (max_ac_x, max_ac_y)
-
-
-def judge_square_sum(c, n):
-    a = 0
-    b = int(math.isqrt(c))  # 获取 c 的平方根的整数部分
-    b = min(b, n)  # 确保 b 不超过 n
-
-    while a <= b:
-        total = a * a + b * b
-        if total == c:
-            return True
-        elif total < c:
-            a += 1
-        else:
-            b -= 1
-
-    return False
-
-
-def judge_valid_triangle(ab2, bc2, ac2, c_point, n):
+def get_max_b_point(ab2, bc2, ac2, c_point, n):
+    # 理解为圆心（0，0）（cx, cy), 半径分别为 ab，和 bc 画圆 的 交点
+    # 如果没有实数解，为False，如果有，取 [0-n] 内任意的整数解
+    # 整理出一元二次方程，
     (cx, cy) = c_point
-    tmp2 = ab2 + ac2 - bc2
-    for i in range(0, n + 1):
-        tmp = tmp2 - 2 * i * cx
-        if tmp % (2 * cy) != 0:
-            continue
+    t = ab2 + ac2 - bc2
 
-        j = int(tmp / (2 * cy))
-        if j > n or j < 0:
-            continue
+    sqrt2 = t * t * (cx * cx - ac2) + 4 * ac2 * cy * cy * ab2
 
-        if (i * i + j * j) != ab2 and (i - cx) * (i - cx) + (j - cy) * (j - cy) != bc2:
-            continue
+    if sqrt2 < 0:
+        return False
 
-        return (i, j)
+    sqrt_tmp = math.isqrt(sqrt2)
 
-    return False
+    if sqrt_tmp**2 != sqrt2:
+        return False
+
+    root = t * cx + sqrt_tmp
+    if root % (2 * ac2) != 0:
+        root = t * cx - sqrt_tmp
+
+        if root % (2 * ac2) != 0:
+            return False
+
+    bx = root // (2 * ac2)
+    if bx < 0 or bx > n:
+        return False
+
+    by2 = ab2 - bx * bx
+    by = math.isqrt(by2)
+    if by**2 != by2:
+        return False
+
+    return (bx, by)
 
 
 def max_similar_triangle(ab2, bc2, ac2, n):
-    d = {}
-    d[n * n * 2] = (n, n)
+    d = []
+    heapq.heappush(d, (-n * n * 2, n, n))
 
     while d:
-        max_ac2, (cx, cy) = pop_max_ac(d)
+        max_ac2, (cx, cy) = get_max_c_point(d)
         if (max_ac2 * ab2) % ac2 != 0 or (max_ac2 * bc2) % ac2 != 0:
             continue
 
         max_ab2 = max_ac2 * ab2 // ac2
         max_bc2 = max_ac2 * bc2 // ac2
 
-        if (
-            judge_square_sum(max_ab2, n) is False
-            or judge_square_sum(max_bc2, n) is False
-        ):
-            continue
-
-        b_point = judge_valid_triangle(max_ab2, max_bc2, max_ac2, (cx, cy), n)
-        if b_point is False:
-            continue
-
-        return b_point, (cx, cy)
+        b_point = get_max_b_point(max_ab2, max_bc2, max_ac2, (cx, cy), n)
+        if b_point:
+            return b_point, (cx, cy)
 
     return False, False
 
@@ -111,6 +98,9 @@ def draw_triangle(b_point, c_point, n):
 
 
 def main():
+    global time1, cost_time
+    time1 = 0
+    cost_time = 0
     try:
         while True:
             try:
@@ -136,5 +126,13 @@ def main():
         pass
 
 
+def benchmark():
+    ab2, bc2, ac2 = 9, 16, 25
+    for n in range(100, 30000):
+        (b_point, c_point) = max_similar_triangle(ab2, bc2, ac2, n)
+        # print(b_point, c_point)
+
+
 if __name__ == "__main__":
     main()
+    # benchmark()
