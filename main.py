@@ -44,12 +44,14 @@ def get_max_b_point(ab2, bc2, ac2, c_point, n):
 
     bx = root // (2 * ac2)
     if bx > n:
-        print("bx 超出范围", bx)
         return False
 
     by2 = ab2 - bx * bx
     by = math.isqrt(by2)
     if by**2 != by2:
+        return False
+
+    if (cx - bx) ** 2 + (cy - by) ** 2 != bc2:
         return False
 
     return (bx, by)
@@ -127,13 +129,25 @@ def main():
         pass
 
 
+def test():
+    (b_point, c_point) = max_similar_triangle(9, 16, 25, 7)
+    draw_triangle(b_point, c_point, 7)
+
+
 def benchmark():
-    ab2, bc2, ac2 = 2, 4, 10
-    for n in range(100, 30000):
-        (b_point, c_point) = max_similar_triangle(ab2, bc2, ac2, n)
-        # print(b_point, c_point)
+    for nx in range(4, 20):
+        for ny in range(4, 20):
+            for bx in range(1, nx):
+                for by in range(0, ny):
+                    ab2 = bx**2 + by**2
+                    bc2 = (nx - bx) ** 2 + (ny - by) ** 2
+                    ac2 = nx**2 + ny**2
+                    print(f"ab2: {ab2}, bc2: {bc2}, ac2: {ac2}, n: {nx + ny}")
+                    (b_point, c_point) = max_similar_triangle(ab2, bc2, ac2, nx + ny)
+                    print(b_point, c_point, nx + ny)
 
 
 if __name__ == "__main__":
-    # main()
-    benchmark()
+    main()
+    # benchmark()
+    # test()
