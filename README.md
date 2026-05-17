@@ -1,23 +1,171 @@
-# zijin
-最大相似三角形
-This code is a Python program designed to find and visualize a triangle on a grid, given the squares of its three side lengths and the size of the grid. The user is prompted to input four integers: the squares of the three triangle sides (ab², bc², ac²) and the grid size n. The program then attempts to find a triangle with integer coordinates on an n x n grid that matches these side lengths.
+# 最大相似三角形 (Largest Similar Triangle)
 
-The core logic involves several helper functions. put_next_max_ac and pop_max_ac manage a dictionary of candidate points for one triangle vertex, always working with the largest possible squared distance first. judge_square_sum checks if a given number can be written as the sum of two squares, with each square not exceeding n², ensuring the triangle's sides can be represented on the grid. judge_valid_triangle tries to find a valid integer coordinate for the second vertex, given the constraints of the triangle's side lengths and the position of the third vertex.
+![Python](https://img.shields.io/badge/Python-3.13.3-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-The main search is performed in max_similar_triangle, which iteratively tries possible positions for the triangle's vertices, scaling the triangle as needed, and checking if the side lengths and positions are valid. If a valid triangle is found, its coordinates are returned.
+一个用于在正方形网格上寻找并可视化最大相似三角形的数学工具。给定三角形三边的平方和网格大小，程序能够找到在给定网格上可以绘制的最大相似三角形。
 
-The draw_triangle function uses the plotext library to plot the triangle on the terminal, labeling axes and drawing the triangle based on the calculated coordinates. The main function handles user input, error checking, and orchestrates the search and drawing process in a loop, allowing repeated attempts until the user exits.
+## 🎯 功能特性
 
-Overall, the program combines mathematical checks with a search strategy to find and display triangles with given side lengths on a discrete grid, providing immediate visual feedback in the terminal.
+- **智能搜索算法**：使用数学约束和优先级队列高效寻找最大相似三角形
+- **终端可视化**：基于 `plotext` 库在终端直接绘制三角形，无需图形界面
+- **交互式界面**：支持连续输入多组数据进行计算
+- **精确验证**：确保所有坐标都是整数且符合三角形约束条件
+- **性能测试**：内置基准测试功能，验证算法正确性
 
+## 📐 数学背景
 
+### 问题描述
 
+在一个步长为 1、边长为 n 的正方形格子上，给定三角形三边的平方 `ab²`、`bc²`、`ac²`，求能够绘制的最大相似三角形的面积。
 
-# 数学题： 三角形 ab, bc, ac 的边长平方分别为 ab2=2, bc2=4, ac2=10
-# 在一个步长为1， 长度为n的正方形格子，求最大的相似三角形的的面积
+### 算法原理
 
-Python 3.13.3
+1. **缩放因子计算**：寻找最大的缩放因子 k，使得 `k × ab²`、`k × bc²`、`k × ac²` 都能表示为两个不超过 n² 的完全平方数之和
 
-## 示例
+2. **坐标验证**：对于每个可能的顶点位置，验证是否存在满足以下条件的整数坐标：
+   - 三角形的三个顶点都在网格范围内
+   - 三边长度符合给定的平方数
+   - 满足三角形不等式
+
+3. **优化策略**：使用最大堆优先处理可能的最大三角形，提高搜索效率
+
+## 🚀 安装
+
+### 环境要求
+
+- Python 3.13.3 或更高版本
+- pip 包管理器
+
+### 安装步骤
+
+1. 克隆仓库：
+```bash
+git clone https://github.com/dlsimple/zijin.git
+cd zijin
+```
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+## 💻 使用方法
+
+### 基本使用
+
+运行主程序：
+```bash
+python main.py
+```
+
+程序会提示输入四个整数（用空格分隔）：
+```
+请输入三角形三边的平方数和正方形的格数（空格隔开）：
+```
+
+输入格式：`ab² bc² ac² n`
+
+### 示例
+
+**示例 1：3-4-5 三角形**
+```
+输入：9 16 25 7
+```
+这会寻找一个边长平方比为 9:16:25 的最大相似三角形，在 7×7 的网格上。
+
+**示例 2：等腰直角三角形**
+```
+输入：2 4 10 8
+```
+这会寻找一个边长平方比为 2:4:10 的最大相似三角形，在 8×8 的网格上。
+
+### 输出说明
+
+- 如果找到符合条件的三角形，程序会：
+  - 在终端绘制三角形图形
+  - 显示 B 点和 C 点的坐标（A 点固定在原点）
+  - 格式：`b(x,y), c(x,y)`
+
+- 如果未找到，程序会显示：`没有找到符合条件的三角形`
+
+### 运行测试
+
+程序内置了测试函数，可以验证特定用例：
+
+```python
+# 在 main.py 中取消注释并运行
+# test()
+```
+
+### 运行基准测试
+
+对于算法验证，可以运行基准测试：
+
+```python
+# 在 main.py 中取消注释并运行
+# benchmark()
+```
+
+## 📁 项目结构
+
+```
+zijin/
+├── main.py              # 主程序文件
+├── requirements.txt     # 依赖包列表
+├── README.md           # 项目说明文档
+├── example.png         # 示例输出图示
+└── .git/               # Git 仓库信息
+```
+
+## 🔧 核心函数
+
+### `max_similar_triangle(ab2, bc2, ac2, n)`
+主搜索函数，寻找最大相似三角形的顶点坐标。
+
+**参数：**
+- `ab2`: AB 边的平方
+- `bc2`: BC 边的平方  
+- `ac2`: AC 边的平方
+- `n`: 网格大小
+
+**返回：**
+- `(b_point, c_point)`: 两个顶点的坐标，如果未找到则返回 `(False, False)`
+
+### `get_max_b_point(ab2, bc2, ac2, c_point, n)`
+根据给定的 C 点坐标，寻找满足条件的 B 点坐标。
+
+### `draw_triangle(b_point, c_point, n)`
+使用 plotext 在终端绘制三角形。
+
+## 📊 示例输出
 
 ![示例](example.png)
+
+## 🛠️ 技术栈
+
+- **Python 3.13.3**: 核心编程语言
+- **plotext 5.3.2**: 终端数据可视化库
+- **heapq**: Python 标准库，用于优先级队列
+- **math**: Python 标准库，用于数学计算
+
+## 📝 算法复杂度
+
+- **时间复杂度**: O(n² log n) - 主要取决于网格大小和堆操作
+- **空间复杂度**: O(n²) - 用于存储候选点集合
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 📄 许可证
+
+本项目采用 MIT 许可证。
+
+## 👨‍💻 作者
+
+dlsimple - [GitHub](https://github.com/dlsimple)
+
+---
+
+**注意**: 本程序仅适用于数学研究和教育目的。对于生产环境使用，建议添加更多的错误处理和边界条件检查。
