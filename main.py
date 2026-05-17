@@ -101,9 +101,6 @@ def draw_triangle(b_point, c_point, n):
 
 
 def main():
-    global time1, cost_time
-    time1 = 0
-    cost_time = 0
     try:
         while True:
             try:
@@ -114,13 +111,13 @@ def main():
                     ).split(),
                 )
 
-                (b_poinx, c_point) = max_similar_triangle(ab2, bc2, ac2, n)
+                (b_point, c_point) = max_similar_triangle(ab2, bc2, ac2, n)
 
-                if b_poinx is False or c_point is False:
+                if b_point is False or c_point is False:
                     print("没有找到符合条件的三角形", end=" ")
                 else:
-                    draw_triangle(b_poinx, c_point, n)
-                    print(f"b{b_poinx}, c{c_point}", end=" ")
+                    draw_triangle(b_point, c_point, n)
+                    print(f"b{b_point}, c{c_point}", end=" ")
 
                 print("或按 Ctrl+C 退出\n")
             except ValueError:
